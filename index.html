@@ -9,11 +9,11 @@
     <p>Second paragraph</p>
     <svg width=150 height=300>
     </svg>
-    <div name="tooltip" opacity=0>
+    <div name="tooltip" opacity=0 width=100 height=100>
     </div>
     <script>
         tooltip = d3.select("#tooltip");
-        d3.select("p").style("color", "red");
+        d3.select("p").style("color", "green");
         xs = d3.scaleLinear().domain([4, 42]).range([0, 200]);
         ys = d3.scaleLinear().domain([0, 5]).range([0, 200]);
         d3.select('svg')
@@ -27,7 +27,7 @@
             .attr('height',10)
             .on("mouseover", function(d,i) {
                 tooltip.style("opacity", 1);
-                // d3.select('svg').attr("width", 10);
+                d3.select('svg').attr("width", 10);
                 // tooltip.style("opacity", 1)
                 // .html("Item #"+i+" is "+d);
             })
