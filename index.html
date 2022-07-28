@@ -14,15 +14,8 @@
     <script>
         tooltip = d3.select("#tooltip");
         d3.select("p").style("color", "red");
-        xdomain = [0,100];
-        xrange = [0,100];
-        ydomain = [0,100];
-        yrange = [0,100];
-        cdomain = [0,1];
-        crange = [0,1];
-        xs = d3.scaleLinear().domain(xdomain).range(xrange);
-        ys = d3.scaleLinear().domain(ydomain).range(yrange);
-        cs = d3.scaleLinear().domain(cdomain).range(crange);
+        xs = d3.scaleLinear().domain([4, 42]).range([0, 200]);
+        ys = d3.scaleLinear().domain([0, 5]).range([0, 200]);
         d3.select('svg')
         .selectAll('rect')
         .data([4,8,15,16,23,42])
@@ -32,10 +25,10 @@
             .attr('y',function(d,i) {return ys(i);})
             .attr('width',function(d,i) {return xs(d);})
             .attr('height',10)
-            .style('fill',function(d,i) {return cs(d);})
             .on("mouseover", function(d,i) {
-                tooltip.style("opacity", 1)
-                .html("Item #"+i+" is "+d);
+                d3.select('svg').html = "1234"
+                // tooltip.style("opacity", 1)
+                // .html("Item #"+i+" is "+d);
             })
             .on("mouseout", function(d) {tooltip.style("opacity", 0)})
     </script>
