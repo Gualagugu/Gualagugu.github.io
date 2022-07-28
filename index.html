@@ -10,7 +10,13 @@
     <svg width=150 height=300>
     </svg>
     <script>
-        d3.select("p").style("color", "red");
+        d3.select("p").style("color", "green");
+        xdomain = [0,1];
+        xrange = [0,1];
+        ydomain = [0,1];
+        yrange = [0,1];
+        cdomain = [0,1];
+        crange = [0,1];
         xs = d3.scaleLinear().domain(xdomain).range(xrange);
         ys = d3.scaleLinear().domain(ydomain).range(yrange);
         cs = d3.scaleLinear().domain(cdomain).range(crange);
