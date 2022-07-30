@@ -1,37 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="src/d3.min.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
 </head>
+<style>
+
+</style>
 <body>
     Hello World
     <p>First paragraph</p>
     <p>Second paragraph</p>
+    <p id="tooltip">tooltip</p>
+    <input class = "scenePicker" type="button"></input>
+    <input class = "scenePicker" type="button"></input>
+    <input class = "scenePicker" type="button"></input>
+    <input id = "slider" type="range" min="0" max="11" value="7" step="1"></input>
     <svg width=150 height=300>
     </svg>
-    <div width=100 height=100 background-color=lightblue>
-    </div>
     <script>
-        tooltip = d3.select("div");
-        d3.select("p").style("color", "green");
+        d3.select('body').select('#slider')
+        .style('color', 'green')
+        .attr('min', '0');
+
+
+        var tooltip = d3.select("#tooltip");
+        tooltip.style("opacity", 1);
+        var svg = d3.select('svg');
+        // var data =[[4,8,15,16,23,42],[1,2,3,4,5,6], [2,3,10,5,6,3]];
+        // d3.csv("/data/data.csv", function(data) {
+        //     for (var i = 0; i < data.length; i++) {
+        //         console.log(data[i].pbp_id);
+        //     }
+        // });
+        var data = d3.csv("/data/data.csv");
+        console.log(data.length);
+        d3.select("p").style("color", "red");
+        d3.select("p").style("color", "red");
         xs = d3.scaleLinear().domain([4, 42]).range([0, 200]);
         ys = d3.scaleLinear().domain([0, 5]).range([0, 200]);
-        d3.select('svg')
-        .selectAll('rect')
-        .data([4,8,15,16,23,42])
-        .enter()
-        .append('rect')
-            .attr('x',20)
-            .attr('y',function(d,i) {return ys(i);})
-            .attr('width',function(d,i) {return xs(d);})
-            .attr('height',10)
-            .on("mouseover", function(d,i) {
-                tooltip.style("opacity", 1);
-                // d3.select('svg').attr("width", 10);
-                // tooltip.style("opacity", 1)
-                // .html("Item #"+i+" is "+d);
-            })
-            .on("mouseout", function(d) {tooltip.style("opacity", 0)})
+
+        d3.select('body').selectAll('.scenePicker')
+        .data(['first', 'second', 'third'])
+        .attr('x', function(d, i) {return 30 * i;})
+        .attr('y', 30)
+        .attr('width', 30)
+        .attr('height', 10)
+        .style('background-color', 'lightblue')
+        .attr('value', function(d) {return d})
+        .on("click", function(d,i) {
+            // tooltip.text("d: " + d + " i: " + i);
+            svg.remove();
+            svg = d3.selectAll("body")
+                .append("svg")
+                .attr('height',300)
+                .attr('width',150);
+            if (i == 0) {
+                svg.selectAll('rect')
+                .data(data[0])
+                .enter()
+                .append('rect')
+                    .attr('x',0)
+                    .attr('height',10)
+                    .attr('y',function(d,i) {return 20 * i + 100;})
+                    .attr('width',function(d,i) {return d * 5;})
+            } if (i == 1) {
+                svg.selectAll('rect')
+                .data(data)
+                .enter()
+                .append('rect')
+                    .attr('x',0)
+                    .attr('height',10)
+                    .attr('y',function(d,i) {return 20 * i + 100;})
+                    .attr('width',function(d,i) {return d * 5;})
+            } if (i == 2) {
+                svg.selectAll('rect')
+                .data(data[2])
+                .enter()
+                .append('rect')
+                    .attr('x',0)
+                    .attr('height',10)
+                    .attr('y',function(d,i) {return 20 * i + 100;})
+                    .attr('width',function(d,i) {return d * 5;})
+            }
+        })
+        
     </script>
 </body>
 </html>
