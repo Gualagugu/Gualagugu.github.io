@@ -5,41 +5,77 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
 </head>
 <style>
+    .input-color {
+        position: relative;
+    }
+    .input-color input {
+        padding-left: 20px;
+    }
+    .input-color .color-box {
+        width: 10px;
+        height: 10px;
+        display: inline-block;
+        background-color: #ccc;
+        position: absolute;
+        left: 5px;
+        top: 5px;
+    }
+    .row {
+    display: flex;
+    }
 
+    .column {
+    flex: 50%;
+    }
 </style>
 <body>
-    <p id="tooltip">Please Select the Scene that You are Interested In!</p>
-    <input class = "scenePicker" type="button"></input>
-    <input class = "scenePicker" type="button"></input>
-    <input class = "scenePicker" type="button"></input>
+    <h2>Patient Status of COVID 19 Cases in India: Correlation with Different Age Group</h2>
+    <p> The patient data of Covid 19 Cases in India has shown an interesteing trend in different age groups, as shown below, we can see that Covid 19 was not a big threat in younger generations, whereas in older generations the deceased rate has significantly increased! Therefore we should be more careful and conscious with contacting older people after potential covid exposure as they are more vulnerable to the virus!</p>
+    <hr>
+    <div class="row">
+        <div class="column">
+            <h3 id="tooltip"></h3>
+            <input class = "scenePicker" type="button"></input>
+            <input class = "scenePicker" type="button"></input>
+            <input class = "scenePicker" type="button"></input>
+            <input class = "scenePicker" type="button"></input>
+            <br>
+            <br>
+            <label>age: 0 </label>
+            <input id = "ageSelector" type="range" min="0" max="100" value="55" step="1"></input>
+            <label> 100 </label>
+        </div>
+        <div class="column">
+            <br>
+            <label> Legend for Pie Chart:</label>
+
+            <br>
+            <br>
+            <div class="input-color">
+                <input type="text" value="Recovered" disabled="true"/>
+                <div class="color-box" style="background-color: #44C953;"></div>
+            </div>
+
+            <div class="input-color">
+                <input type="text" value="Hospitalized" disabled="true"/>
+                <div class="color-box" style="background-color: #C98844;"></div>
+            </div>
+
+            <div class="input-color">
+                <input type="text" value="Deceased" disabled="true"/>
+                <div class="color-box" style="background-color: #C94444;"></div>
+            </div>
+        </div>
+      </div>
     <br>
-    <br>
-    <input id = "slider" type="range" min="0" max="7" value="0" step="1" disabled="true"></input>
-    <input id = "ageSelector" type="range" min="0" max="100" value="55" step="1" disabled="true"></input>
-    <button id = "genderSelecter"  type="button" disabled="true">Gender Selector</button>
-    <br>
+    <hr>
     <script>
-        var margin = {top: 100, right: 80, bottom: 100, left: 100},
+        var margin = {top: 100, right: 80, bottom: 20, left: 100},
             width = 800 - margin.left - margin.right,
             height = 800 - margin.top - margin.bottom;
-        const Months = ['January', 'Febuary', 'March', 'April', 'May', 'June', 'July', 'August'];
-        const Cutoffs = [0, 2, 31, 527, 1463, 2495, 3510, 4482, 4692];
         var tooltip = d3.select("#tooltip");
-        const Genders = ["Female", "Male"];
-        var month = document.getElementById("slider").value;
-            gender = 0;
-            age = document.getElementById("ageSelector").value;
-        var slider = d3.select('body').select('#slider');
+        var age = document.getElementById("ageSelector").value;
         var ageSelector = d3.select('body').select('#ageSelector');
-        var genderSelecter = d3.select('body').select('#genderSelecter').text(Genders[gender]);
-        genderSelecter.on('click', () => {
-            gender = (gender+1)%2;
-            genderSelecter.text(Genders[gender]);
-        });
-        slider.on('change', () => {
-            month = document.getElementById("slider").value;
-            tooltip.text(Months[month]);
-        });
         ageSelector.on('change', () => {
             age = document.getElementById("ageSelector").value;
             tooltip.text("Showing age of " + age);
@@ -47,7 +83,7 @@
         tooltip.style("opacity", 1);
         var svg = d3.select('svg');
         d3.select('body').selectAll('.scenePicker')
-            .data(['Geographic Information of Covid Cases', 'Patient Status of Men and Women', 'Patient Status of different Ages'])
+            .data(['Children', 'Younger Adult', 'Adult', 'Elder Adults'])
             .attr('x', function(d, i) {return 30 * i;})
             .attr('y', 30)
             .attr('width', 30)
@@ -55,55 +91,24 @@
             .style('background-color', 'lightblue')
             .attr('value', function(d) {return d})
             .on("click", function(d,i) {
-                d3.selectAll("body").select("svg").remove();
-                if (i == 0) {
-                    tooltip.text("Please use the slider to select the month that you are interested in!");
-                    document.getElementById("slider").disabled = false;
-                    document.getElementById("ageSelector").disabled = true;
-                    document.getElementById("genderSelecter").disabled = true;
-                    svg = d3.selectAll("body")
-                        .append("svg")
-                        .attr("width", width + margin.left + margin.right)
-                        .attr("height", height + margin.top + margin.bottom)
-                        .append("g")
-                        .attr("transform",
-                            "translate(" + margin.left + "," + margin.top + ")")
-                    refreshScatterPlot();
-                    slider.on('change', () => {
-                        month = document.getElementById("slider").value;
-                        tooltip.text("Current Month is " + Months[month]);
-                        refreshScatterPlot();
-                    });
-                } else if (i == 1) {
-                    tooltip.text("Please use the button to toggle between Male and Female");
-                    document.getElementById("slider").disabled = true;
-                    document.getElementById("ageSelector").disabled = true;
-                    document.getElementById("genderSelecter").disabled = false;
-                    refreshGenderPiePlot();
-                    genderSelecter.on('click', () => {
-                        tooltip.text("Showing gender of " + Genders[gender]);
-                        gender = (gender+1)%2;
-                        genderSelecter.text(Genders[gender]);
-                        refreshGenderPiePlot();
-                    });
-                } else if (i == 2) {
-                    tooltip.text("Please use the slider to select the age that you are interested in!");
-                    document.getElementById("slider").disabled = true;
-                    document.getElementById("ageSelector").disabled = false;
-                    document.getElementById("genderSelecter").disabled = true;
-                    refreshAgePiePlot();
-                    ageSelector.on('click', () => {
-                        age = document.getElementById("ageSelector").value;           
-                        tooltip.text("Showing age of " + age);
-                        refreshAgePiePlot();
-                    });
-                }
+                if (i == 0) {age = 1;} 
+                else if (i == 1) { age = 20;}
+                else if (i == 2) { age = 45;}
+                else { age = 75;}
+                document.getElementById("ageSelector").value = age;
+                tooltip.text("Showing age of " + age);
+                refreshAgePiePlot();
             })
+            tooltip.text("Please use the button to select the age group that you are interested in or adjust to the exact age using the slider below!");
+            refreshAgePiePlot();
+            ageSelector.on('click', () => {
+                age = document.getElementById("ageSelector").value;           
+                tooltip.text("Showing age of " + age);
+                refreshAgePiePlot();
+            });
 
             function refreshAgePiePlot() {
                 d3.csv("/data/patients_info.csv").then((data) => {
-
-                    console.log(age);
                     var currentdata = [0, 0, 0];
                     for (var i = 0; i < data.length; i++) {
                         if (data[i].Age == age) {
@@ -133,8 +138,9 @@
                     .value(function(d) {return d.value; })
                     var data_ready = pie(d3.entries(currentdata))
 
+                    console.log(age, currentdata, data_ready);
                     svg
-                    .selectAll('whatever')
+                    .selectAll('a')
                     .data(data_ready)
                     .enter()
                     .append('path')
@@ -143,15 +149,16 @@
                         .outerRadius(radius)
                     )
                     .attr('fill', function(d){ return(color(d.data.key)) })
-                    .attr("stroke", "black")
+                    .attr("stroke", "white")
                     .style("stroke-width", "2px")
                     .style("opacity", 0.7)
+                    
                     if (age < 10) {
                         svg.append("g").call(d3.annotation().annotations([{
                         note: {
-                            label: "Children (age 0-10)",
+                            title: "Children (age 0-10)",
                             bgPadding: 20,
-                            title: "Younger children have a high deceased rate"
+                            label: "Younger children have a very high percentage of recovery"
                         },
                         //can use x, y directly instead of data
                             data: { date: "18-Sep-09", close: 185.02 },
@@ -166,7 +173,7 @@
                         note: {
                             title: "Younger Adult (age 10-30)",
                             bgPadding: 20,
-                            label: "Younger adults shows a very high percentage of recovery"
+                            label: "Younger adults shows a higher hospitality rates than children"
                         },
                         //can use x, y directly instead of data
                             data: { date: "18-Sep-09", close: 185.02 },
@@ -181,7 +188,7 @@
                         note: {
                             title: "Adult (age 30-60)",
                             bgPadding: 20,
-                            label: "Adults have a higher hospitality rates than younger adults"
+                            label: "Adults have a higher deceased rates than younger adults"
                         },
                         //can use x, y directly instead of data
                             data: { date: "18-Sep-09", close: 185.02 },
@@ -196,7 +203,7 @@
                         note: {
                             title: "Elder Adults (age 60+)",
                             bgPadding: 20,
-                            label: "Elders have higher deceased rates"
+                            label: "Elders have a even higher deceased rates than adults"
                         },
                         //can use x, y directly instead of data
                             data: { date: "18-Sep-09", close: 185.02 },
@@ -207,116 +214,6 @@
                             dx: -162
                         }]))
                     }
-                })
-            }
-
-            function refreshGenderPiePlot() {
-                d3.csv("/data/patients_info.csv").then((data) => {
-                    d3.selectAll("body").select("svg").remove();
-                    var radius = Math.min(width, height) / 2 - margin.left
-                    var svg = d3.select("body")
-                    .append("svg")
-                        .attr("width", width)
-                        .attr("height", height)
-                    .append("g")
-                        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-                    var currentdata = [0, 0, 0];
-                    if (gender)genderVal = "F"; else genderVal = "M";
-                    for (var i = 0; i < data.length; i++) {
-                        if (data[i].Current_Status == "Recovered") {
-                            if (data[i].Gender == genderVal) currentdata[0]++;
-                            }
-                        else if (data[i].Current_Status == "Hospitalized") {
-                                if (data[i].Gender == genderVal) currentdata[1]++;
-                            }
-                        else if (data[i].Current_Status == "Deceased") {
-                                if (data[i].Gender == genderVal) currentdata[2]++;
-                            }
-                        }
-                    console.log(currentdata);
-                    // set the color scale
-                    var color = d3.scaleOrdinal()
-                    .domain(currentdata)
-                    .range(d3.schemeSet1)
-                    
-                    
-                    // Compute the position of each group on the pie:
-                    var pie = d3.pie()
-                    .value(function(d) {return d.value; })
-                    var data_ready = pie(d3.entries(currentdata))
-
-                    // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
-                    svg
-                    .selectAll('whatever')
-                    .data(data_ready)
-                    .enter()
-                    .append('path')
-                    .attr('d', d3.arc()
-                        .innerRadius(100)         // This is the size of the donut hole
-                        .outerRadius(radius)
-                    )
-                    .attr('fill', function(d){ return(color(d.data.key)) })
-                    .attr("stroke", "black")
-                    .style("stroke-width", "2px")
-                    .style("opacity", 0.7)
-
-                svg.append("g").call(d3.annotation().annotations([{
-                    note: {
-                        title: "Observation:",
-                        bgPadding: 20,
-                        label: "There is barely any differences noticed in patient status, which implies that COVID 19 is not targeted towards a specific gender"
-                    },
-                    //can use x, y directly instead of data
-                        data: { date: "18-Sep-09", close: 185.02 },
-                        className: "show-bg",
-                        x: 0,
-                        y: 0,
-                        dy: 100,
-                        dx: 100
-                }]))
-                })
-            }
-            function refreshScatterPlot() {
-                d3.csv("/data/complete.csv").then((data) => {
-                    var currentdata = [];
-                    for (var i = Cutoffs[month]; i < Cutoffs[parseInt(month)+1]; i++) {currentdata.push(data[i]);}
-                    // Add X axis
-
-                    var x = d3.scaleLinear()
-                        .domain([65,100])
-                        .range([ 0, width]);
-                    svg.append("g")
-                        .attr("transform", "translate(0," + height + ")")
-                        .call(d3.axisBottom(x));
-
-                    // Add Y axis
-                    var y = d3.scaleLinear()
-                        .domain([8, 36])
-                        .range([height, 0]);
-                    svg.append("g")
-                        .call(d3.axisLeft(y));
-                    //calculate r
-                    var r = d3.scaleLog()         
-                        .domain([1, 100000])
-                        .range([0, width/15]);
-                    //getcolor
-                    var myColor = d3.scaleOrdinal()
-                        .domain(["Kerala","Delhi","Telengana","Haryana","Rajasthan","Uttar Pradesh","Tamil Nadu","Union Territory of Ladakh","Karnataka","Maharashtra","Punjab","Union Territory of Jammu and Kashmir","Andhra Pradesh","Uttarakhand","Odisha","Puducherry","West Bengal","Chhattisgarh","Union Territory of Chandigarh","Gujarat","Chandigarh","Himachal Pradesh","Jammu and Kashmir","Ladakh","Madhya Pradesh","Bihar","Manipur","Mizoram","Andaman and Nicobar Islands","Goa","Assam","Jharkhand","Arunachal Pradesh","Tripura","Meghalaya","Dadra and Nagar Haveli and Daman and Diu","Sikkim","Nagaland","Telangana","Telangana***"])
-                        .range(d3.schemeSet1);
-                    svg.selectAll('g').selectAll("circle").remove();
-                    svg.append('g')
-                        .selectAll("dot")
-                        .data(currentdata)
-                        .enter()
-                        .append("circle")
-                        .attr("class", "bubble")
-                        .attr("cx", function (d) { return x(d.Longitude); } )
-                        .attr("cy", function (d) { return y(d.Latitude); } )
-                        .attr("r", function (d) {  return r(d.Total_Confirmed_cases); })
-                        .style("fill", function (d) { return myColor(d.Name_of_State)})
-                        .style("opacity", 0.5)
-                    d3.selectAll(".bubble").style("opacity", 0.1)
-
                 })
             }
     </script>
